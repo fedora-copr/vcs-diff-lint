@@ -1,0 +1,41 @@
+Differential linting for your VCS repo
+======================================
+
+Analyze code, and print only reports related to a particular change.
+
+From within a VCS directory (only Git is supported for now) first
+- analyze set of changed files against given changeset (origin/main by default)
+  so we know what files need to be analyzed,
+- run code analyzers (e.g. PyLint) against the old code (before changes), then
+- run analyzers against the actual code (not yet pushed changes),
+- perform a diff (using csdiff), and finally
+- print a set of added (or even fixed, as opt-in) analyzers' warnings.
+
+
+Features
+--------
+
+- PyLint support
+- monorepo support (multiple sub-projects in repo sub-directories)
+- file renames supported (if a file was just renamed, reports in the new
+  filename are not reported as new)
+
+Usage
+-----
+
+In a local git clone directory, run:
+
+    $ cd my_project && vcs-diff-lint
+    ================
+     Fixed warnings
+    ================
+
+    Error: PYLINT_WARNING:
+    coprs_frontend/manage.py:9: W0611[unused-import]: Unused import importlib
+
+    ================
+     Added warnings
+    ================
+
+    Error: PYLINT_WARNING:
+    coprs_frontend/manage.py:105:4: C0104[disallowed-name]: Disallowed name "foo"
