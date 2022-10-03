@@ -14,10 +14,14 @@ Source0: %name-%version.tar.gz
 Requires: csdiff
 
 %description
-From within a VCS directory (only Git is supported for now), first run code
-analyzers (e.g. PyLint) against the old code (before changes), then run
-analyzers against the actual code (not yet pushed changes), perform a diff and
-finally print a set of added (or even fixed, as opt-in) analyzers' warnings.
+Analyze code, and print only reports related to a particular change.
+
+From within a VCS directory (only Git is supported for now) first analyze set of
+changed files against given changeset (origin/main by default) so we know what
+files need to be analyzed.  Then run code analyzers (e.g. PyLint) against the
+old code (before changes), run analyzers against the actual code (not yet pushed
+changes), perform a diff (using csdiff utility), and finally print a set of
+added (or even fixed, as opt-in) analyzers' warnings.
 
 
 %prep
