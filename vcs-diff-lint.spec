@@ -32,6 +32,7 @@ install -p vcs-diff-lint-csdiff-pylint %buildroot%_bindir
 
 %files
 %license LICENSE
+%doc README
 %_bindir/vcs-diff-lint*
 
 
