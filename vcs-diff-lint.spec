@@ -13,6 +13,7 @@ Source0: %name-%version.tar.gz
 
 Requires: csdiff
 Requires: git
+Requires: pylint
 
 %description
 Analyze code, and print only reports related to a particular change.
