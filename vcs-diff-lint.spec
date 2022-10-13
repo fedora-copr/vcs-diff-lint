@@ -30,6 +30,10 @@ added (or even fixed, as opt-in) analyzers' warnings.
 %autosetup
 
 
+%build
+# Intentionally empty — nothing to build in this package.
+
+
 %install
 install -d %buildroot%_bindir
 install -p vcs-diff-lint %buildroot%_bindir
