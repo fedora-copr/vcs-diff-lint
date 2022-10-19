@@ -21,15 +21,19 @@ CSDIFF_PYLINT = os.path.realpath(os.path.join(os.path.dirname(__file__),
                                               'vcs-diff-lint-csdiff-pylint'))
 
 
+def print_stderr(*args):
+    print(*args, file=sys.stderr)
+
+
 def _run_csdiff(old, new, msg):
     popen_diff = Popen(['csdiff', '-c', old, new],
                        stdout=PIPE)
     diff = popen_diff.communicate()[0].decode('utf-8')
     if diff:
         sep = "=" * (len(msg) + 2)
-        print(sep)
-        print(" {} ".format(msg))
-        print(sep + "\n")
+        print_stderr(sep)
+        print_stderr(" {} ".format(msg))
+        print_stderr(sep + "\n")
         sys.stdout.write(diff)
     return int(bool(diff))
 
@@ -291,7 +295,7 @@ class _Worker:  # pylint: disable=too-few-public-methods
 
             if self.options.print_fixed_errors:
                 _run_csdiff(new_report, old_report, "Fixed warnings")
-                print()
+                print_stderr()
 
             sys.exit(_run_csdiff(old_report, new_report, "Added warnings"))
 
