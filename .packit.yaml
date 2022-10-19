@@ -2,6 +2,9 @@
 # https://packit.dev/docs/configuration/
 
 ---
+srpm_build_deps:
+  - tito
+
 jobs:
   - job: copr_build
     trigger: pull_request
@@ -18,5 +21,3 @@ jobs:
     upstream_package_name: vcs-diff-lint
     downstream_package_name: vcs-diff-lint
     upstream_tag_template: 'vcs-diff-lint-{version}'
-    srpm_build_deps:
-      - tito
