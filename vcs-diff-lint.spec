@@ -1,5 +1,5 @@
 Name:    vcs-diff-lint
-Version: 1
+Version: 2
 Release: 1%{?dist}
 Summary: VCS Differential Code Analysis Tool
 BuildArch: noarch
@@ -47,5 +47,8 @@ install -p vcs-diff-lint-csdiff-pylint %buildroot%_bindir
 
 
 %changelog
+* Thu Oct 20 2022 Pavel Raiskup <praiskup@redhat.com> 2-1
+- don't pollute stdout so csgrep can read it
+
 * Thu Sep 29 2022 Pavel Raiskup <praiskup@redhat.com> 1-1
 - new package built with tito
