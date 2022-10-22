@@ -1,0 +1,94 @@
+#! /usr/bin/python3
+
+"""
+The csdiff tool doesn't support the Mypy's output.  The thing is that Mypy
+doesn't provide any machine-readable output:
+    https://github.com/python/mypy/issues/10816
+
+So this just a trivial wrapper which reads Mypy's report and transforms it to
+JSON which is supported by csdiff.
+"""
+
+import sys
+import logging
+import subprocess
+
+MYPY = ["mypy", "--no-error-summary"]
+
+logging.basicConfig(level=logging.INFO)
+LOG = logging.getLogger()
+
+
+class MultilineSkipper:
+    """
+    Skip the Mypy's multiline errors if `self.skip_line(line)` return True.
+    Mypy seems to have only one multi-line error ATM.
+    """
+
+    searching_for = None
+
+    def skip_line(self, line):
+        """
+        Return True if the LINE should be skipped (not parsed).
+        """
+        if self.searching_for:
+            if self.searching_for in line:
+                self.searching_for = None
+            return True
+
+        # This one is hard to avoid:
+        # error: Duplicate module named "__main__" (also at "vcs-diff-lint")
+        # note: See https://mypy.readthedocs.io/en/stable/running_mypy.html#mapping-file-paths-to-modules for more info
+        # note: Common resolutions include: a) using `--exclude` to avoid checking one of them, b) adding `__init__.py` somewhere, c) using `--explicit-package-bases` or adjusting MYPYPATH
+        if 'Duplicate module named "__main__"' in line:
+            self.searching_for = "note: Common resolutions include: a) using `--exclude`"
+            return True
+
+        # note: This violates the Liskov substitution principle
+        # note: See https://mypy.readthedocs.io/en/stable/common_issues.html#incompatible-overrides
+        # note: It is recommended for "__eq__" to work with arbitrary objects, for example:
+        # note:     def __eq__(self, other: object) -> bool:
+        # note:         if not isinstance(other, X):
+        # note:             return NotImplemented
+        # note:         return <logic to compare two X instances>
+        if '"__eq__" is incompatible with supertype "object"' in line:
+            self.searching_for = "logic to compare two X instances"
+            return False
+        return False
+
+
+def _main():
+    mypy_cmd = MYPY + sys.argv[1:]
+
+    with subprocess.Popen(mypy_cmd, shell=False,
+                          stdout=subprocess.PIPE) as sp:
+        skipper = MultilineSkipper()
+
+        for line in iter(sp.stdout.readline, b''):
+            line = line.decode("utf8").strip()
+            if skipper.skip_line(line):
+                LOG.debug("Skipping line: %s", line)
+                continue
+
+            try:
+                file, rest = line.split(":", 1)
+                lineno, rest = rest.split(": ", 1)
+                msgtype, msg = rest.split(": ", 1)
+            except ValueError:
+                LOG.error("Can't parse line: %s", line)
+                return 1
+
+            print("Error: MYPY_{}:".format(msgtype.upper()))
+            print("{file}:{line}: {event}: {msg}".format(
+                file=file,
+                line=lineno,
+                event="{}[{}]".format("mypy", msgtype),
+                msg=msg,
+            ))
+            print()
+
+        return sp.returncode
+
+
+if __name__ == "__main__":
+    sys.exit(_main())

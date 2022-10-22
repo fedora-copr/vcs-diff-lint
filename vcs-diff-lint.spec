@@ -14,6 +14,7 @@ Source0: %name-%version.tar.gz
 Requires: csdiff
 Requires: git
 Requires: pylint
+Requires: python3-mypy
 
 %description
 Analyze code, and print only reports related to a particular change.
@@ -38,6 +39,7 @@ added (or even fixed, as opt-in) analyzers' warnings.
 install -d %buildroot%_bindir
 install -p vcs-diff-lint %buildroot%_bindir
 install -p vcs-diff-lint-csdiff-pylint %buildroot%_bindir
+install -p vcs-diff-lint-csdiff-mypy   %buildroot%_bindir
 
 
 %files

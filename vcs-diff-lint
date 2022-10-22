@@ -20,6 +20,9 @@ log = logging.getLogger()  # pylint: disable=invalid-name
 CSDIFF_PYLINT = os.path.realpath(os.path.join(os.path.dirname(__file__),
                                               'vcs-diff-lint-csdiff-pylint'))
 
+CSDIFF_MYPY = os.path.realpath(os.path.join(os.path.dirname(__file__),
+                                            'vcs-diff-lint-csdiff-mypy'))
+
 
 def print_stderr(*args):
     print(*args, file=sys.stderr)
@@ -145,6 +148,18 @@ class PylintLinter(_Linter):
         return cmd, env
 
 
+class MypyLinter(_Linter):
+    """
+    Generate Mypy error output compatible with 'csdiff'.
+    """
+    def is_compatible(self, file):
+        return file.type == 'python'
+
+    def command(self, projectdir, filenames):
+        cmd = [CSDIFF_MYPY] + filenames
+        return cmd, {}
+
+
 def get_rename_map(options, subdir):
     """
     Using the os.getcwd() and 'git diff --namestatus', generate list of
@@ -188,7 +203,7 @@ class _Worker:  # pylint: disable=too-few-public-methods
     projectsubdir = None
     workdir = None
     checkout = None
-    linters = [PylintLinter]
+    linters = [PylintLinter, MypyLinter]
 
     def __init__(self, options):
         self.options = options

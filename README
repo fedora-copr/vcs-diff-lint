@@ -15,7 +15,7 @@ From within a VCS directory (only Git is supported for now) first
 Features
 --------
 
-- PyLint support
+- PyLint and Mypy support
 - monorepo support (multiple sub-projects in repo sub-directories)
 - file renames supported (if a file was just renamed, reports in the new
   filename are not reported as new)
