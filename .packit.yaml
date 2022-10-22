@@ -6,11 +6,14 @@ srpm_build_deps:
   - tito
 
 jobs:
-  - job: copr_build
+  - &copr
+    job: copr_build
     trigger: pull_request
     metadata:
       targets:
-        - fedora-rawhide
+        - epel-8-x86_64
+        - epel-9-x86_64
+        - fedora-all-x86_64
     actions:
       create-archive:
         - bash -c "tito build --tgz --test -o ."
@@ -21,3 +24,10 @@ jobs:
     upstream_package_name: vcs-diff-lint
     downstream_package_name: vcs-diff-lint
     upstream_tag_template: 'vcs-diff-lint-{version}'
+
+  - <<: *copr
+    trigger: commit
+    metadata:
+      owner: "@copr"
+      project: "vcs-diff-lint"
+      branch: main
