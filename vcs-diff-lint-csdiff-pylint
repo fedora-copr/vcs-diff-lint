@@ -21,24 +21,25 @@ def _main():
     # pylint: disable=subprocess-run-check
     pylint_result = subprocess.run(pylint_command, capture_output=True)
     data = json.loads(pylint_result.stdout)
-    csdiff_data = []
     for defect in data:
         message = defect["obj"] + ": " if defect["obj"] else ""
         message += defect["message"]
 
-        csdiff_data.append({
-            "checker": "PYLINT_WARNING",
-            "events": [{
-                "file_name": defect["path"],
-                "line": defect["line"],
-                "column": defect["column"],
-                "event": "{}[{}]".format(defect["message-id"],
-                                         defect["symbol"]),
-                "message": message,
-            }],
-        })
+        column = defect["column"] or ""
+        colsep = ":" if column else ""
 
-    print(json.dumps({"defects": csdiff_data}, indent=2))
+        print("Error: PYLINT_WARNING:")
+        print("{file}:{line}{colsep}{column}: {event}: {msg}".format(
+            file=defect["path"],
+            line=defect["line"],
+            colsep=colsep,
+            column=column,
+            event="{}[{}]".format(defect["message-id"],
+                                         defect["symbol"]),
+            msg=message,
+        ))
+        print()
+
     return pylint_result.returncode
 
 
