@@ -29,7 +29,7 @@ init-hook=
 
 
 # Our own pylint transformations.
-load-plugins=pylint_copr_plugin
+#load-plugins=pylint_plugin
 
 [MESSAGES CONTROL]
 # Reasoning for wide warning ignore
@@ -60,11 +60,11 @@ dummy-variables-rgx=_|dummy|step_impl
 [BASIC]
 # Regular expression which should only match correct module names
 # We ignore all
-# - "copr-*" scripts (lowercase)
+# - "vcs-diff-lint-*" scripts (lowercase)
 # - alembic migrations
 # - fdec9947f8a1
 # Default is: [a-z_][a-z0-9_]{2,30}$
-module-rgx=(copr-[a-z-]*|[0-9a-f]{12}_[a-z_]+|[a-z_][a-z0-9_]{2,30})$
+module-rgx=(vcs-diff-lint-[a-z-]*|[0-9a-f]{12}_[a-z_]+|[a-z_][a-z0-9_]{2,30})$
 
 # Regular expression which should only match correct module level names
 const-rgx=(([a-zA-Z_][a-zA-Z0-9_]*)|(__.*__))$
