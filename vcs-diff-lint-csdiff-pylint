@@ -11,6 +11,7 @@ The script accepts the same parameters as pylint itself.
 import sys
 import json
 import subprocess
+import some_weird_include
 
 PYLINT = ["pylint", "-rn", "--score=no", "--output-format=json"]
 
