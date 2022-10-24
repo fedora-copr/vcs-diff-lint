@@ -23,7 +23,9 @@ Features
 Usage
 -----
 
-In a local git clone directory, run:
+Use the https://github.com/marketplace/actions/vcs-diff-lint GitHub Action.
+
+Alternatively, in a local git clone directory, run:
 
     $ cd my_project && vcs-diff-lint
     ================
