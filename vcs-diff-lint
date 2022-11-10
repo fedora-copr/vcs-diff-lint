@@ -24,19 +24,16 @@ CSDIFF_MYPY = os.path.realpath(os.path.join(os.path.dirname(__file__),
                                             'vcs-diff-lint-csdiff-mypy'))
 
 
-def print_stderr(*args):
-    print(*args, file=sys.stderr)
-
-
 def _run_csdiff(old, new, msg):
     popen_diff = Popen(['csdiff', '-c', old, new],
                        stdout=PIPE)
     diff = popen_diff.communicate()[0].decode('utf-8')
     if diff:
-        sep = "=" * (len(msg) + 2)
-        print_stderr(sep)
-        print_stderr(" {} ".format(msg))
-        print_stderr(sep + "\n")
+        if msg:
+            sep = "=" * (len(msg) + 2)
+            print("# " + sep)
+            print("#  {} ".format(msg))
+            print("# " + sep + "\n")
         sys.stdout.write(diff)
     return int(bool(diff))
 
@@ -310,11 +307,18 @@ class _Worker:  # pylint: disable=too-few-public-methods
                 finally:
                     os.chdir(oldcwd)
 
+            msg = None
             if self.options.print_fixed_errors:
-                _run_csdiff(new_report, old_report, "Fixed warnings")
-                print_stderr()
+                msg = "Added warnings"
 
-            sys.exit(_run_csdiff(old_report, new_report, "Added warnings"))
+            exit_status = _run_csdiff(old_report, new_report, msg)
+
+            if self.options.print_fixed_errors:
+                print()
+                _run_csdiff(new_report, old_report, "Fixed warnings")
+
+            sys.exit(exit_status)
+
 
         finally:
             log.debug("removing workdir %s", self.workdir)

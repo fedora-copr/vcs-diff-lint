@@ -27,17 +27,17 @@ Use the https://github.com/marketplace/actions/vcs-diff-lint GitHub Action.
 
 Alternatively, in a local git clone directory, run:
 
-    $ cd my_project && vcs-diff-lint
-    ================
-     Fixed warnings
-    ================
-
-    Error: PYLINT_WARNING:
-    coprs_frontend/manage.py:9: W0611[unused-import]: Unused import importlib
-
-    ================
-     Added warnings
-    ================
+    $ cd my_project && vcs-diff-lint --print-fixed-errors
+    # ================
+    #  Added warnings
+    # ================
 
     Error: PYLINT_WARNING:
     coprs_frontend/manage.py:105:4: C0104[disallowed-name]: Disallowed name "foo"
+
+    # ================
+    #  Fixed warnings
+    # ================
+
+    Error: PYLINT_WARNING:
+    coprs_frontend/manage.py:9: W0611[unused-import]: Unused import importlib
