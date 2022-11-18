@@ -9,6 +9,7 @@ So this just a trivial wrapper which reads Mypy's report and transforms it to
 JSON which is supported by csdiff.
 """
 
+import os
 import sys
 import logging
 import subprocess
@@ -58,7 +59,9 @@ class MultilineSkipper:
 
 
 def _main():
-    mypy_cmd = MYPY + sys.argv[1:]
+    files = sys.argv[1:]
+    mypy_cmd = MYPY + files
+    real_paths = [os.path.realpath(x) for x in files]
 
     with subprocess.Popen(mypy_cmd, shell=False,
                           stdout=subprocess.PIPE) as sp:
@@ -77,6 +80,11 @@ def _main():
             except ValueError:
                 LOG.error("Can't parse line: %s", line)
                 return 1
+
+            real_path = os.path.realpath(file)
+            if real_path not in real_paths:
+                LOG.debug("Skipping non-related %s in file %s", msg, file)
+                continue
 
             print("Error: MYPY_{}:".format(msgtype.upper()))
             print("{file}:{line}: {event}: {msg}".format(
