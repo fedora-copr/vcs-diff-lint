@@ -4,12 +4,14 @@
 Using 'csdiff', print newly added coding errors.
 """
 
+import fnmatch
 import os
 import sys
 from subprocess import Popen, PIPE, check_output, check_call
 import glob
 import logging
 import tempfile
+from typing import List
 import shutil
 import argparse
 
@@ -62,6 +64,7 @@ def file_type(filename):
 class _Linter:
     filetype = None
     path_filters = None
+    linter_tags: List[str] = []
 
     def __init__(self, gitroot, renames=None):
         self.gitroot = gitroot
@@ -132,6 +135,11 @@ class PylintLinter(_Linter):
     """
     Generate pyilnt error output that is compatible with 'csdiff'.
     """
+    linter_tags = [
+        "pylint",
+        "python",
+    ]
+
     def is_compatible(self, file):
         return file.type == 'python'
 
@@ -149,6 +157,11 @@ class MypyLinter(_Linter):
     """
     Generate Mypy error output compatible with 'csdiff'.
     """
+    linter_tags = [
+        "mypy",
+        "python",
+    ]
+
     def is_compatible(self, file):
         return file.type == 'python'
 
@@ -280,9 +293,24 @@ class _Worker:  # pylint: disable=too-few-public-methods
             if old and old != new:
                 renames.append((old, new))
 
-        for LinterClass in self.linters:
-            linter_new = LinterClass(self.gitroot)
-            linter_old = LinterClass(old_gitroot, renames)
+        selected_linters = set()
+
+        log.debug("Selected linters %s", self.options.linter_tags)
+
+        for linter in self.linters:
+            found = False
+            for pattern in self.options.linter_tags:
+                for tag in linter.linter_tags:
+                    if fnmatch.fnmatch(tag, pattern):
+                        selected_linters.add(linter)
+                        found = True
+                        break
+                if found:
+                    break
+
+        for linterClass in selected_linters:
+            linter_new = linterClass(self.gitroot)
+            linter_old = linterClass(old_gitroot, renames)
             linter_new.lint(self.projectdir, new_files, logfd=new_report_fd)
             linter_old.lint(self.projectdir, old_files, logfd=old_report_fd)
 
@@ -351,11 +379,25 @@ def _get_arg_parser():
         default=False,
         help="Also print defects which were fixed by the changes",
     )
+    parser.add_argument(
+        "--linter-tag",
+        metavar="TAG_PATTERN",
+        dest="linter_tags",
+        default=None,
+        action="append",
+        help=(
+            "Select a set of linters using TAGS (fnmatch pattern). "
+            "Can be specified multiple times."
+        ),
+    )
     return parser
 
 
 def _main():
     options = _get_arg_parser().parse_args()
+    if options.linter_tags is None:
+        # By default select all
+        options.linter_tags = ['*']
     log.setLevel(level=getattr(logging, options.log_level.upper()))
     worker = _Worker(options)
     worker.run()
