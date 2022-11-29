@@ -250,6 +250,9 @@ class _Worker:  # pylint: disable=too-few-public-methods
             if glob.glob(os.path.join(path, '*.spec')):
                 rel_projdir(path)
                 return
+            if os.path.exists(os.path.join(path, ".vcs-diff-lint.yml")):
+                rel_projdir(path)
+                return
             path = os.path.normpath(os.path.join(path, '..'))
 
     def _run_linters(self, old_report_fd, new_report_fd):

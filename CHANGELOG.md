@@ -13,3 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   all the preconfigured linters.  But this option allows users to select.
   For example, when just `pylint` run is desirable, use `--linter-tag pylint`.
   This option can be specified multiple times.
+
+- Sub-projects (sub-directories) are detected even by existence of
+  `.vcs-diff-lint.yml` file, not just `*.spec` file.
