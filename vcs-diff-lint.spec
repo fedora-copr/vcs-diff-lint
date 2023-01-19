@@ -15,6 +15,7 @@ Requires: csdiff
 Requires: git
 Requires: pylint
 Requires: python3-mypy
+Requires: python3-types-requests
 
 %description
 Analyze code, and print only reports related to a particular change.
