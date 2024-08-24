@@ -25,6 +25,9 @@ CSDIFF_PYLINT = os.path.realpath(os.path.join(os.path.dirname(__file__),
 CSDIFF_MYPY = os.path.realpath(os.path.join(os.path.dirname(__file__),
                                             'vcs-diff-lint-csdiff-mypy'))
 
+CSDIFF_RUFF = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), 'vcs-diff-lint-csdiff-ruff'))
+
 
 def _run_csdiff(old, new, msg):
     popen_diff = Popen(['csdiff', '-c', old, new],
@@ -170,6 +173,23 @@ class MypyLinter(_Linter):
         return cmd, {}
 
 
+class RuffLinter(_Linter):
+    """
+    Generate Ruff error output compatible with 'csdiff'.
+    """
+    linter_tags = [
+        "ruff",
+        "python",
+    ]
+
+    def is_compatible(self, file):
+        return file.type == 'python'
+
+    def command(self, projectdir, filenames):
+        cmd = [CSDIFF_RUFF] + filenames
+        return cmd, {}
+
+
 def get_rename_map(options, subdir):
     """
     Using the os.getcwd() and 'git diff --namestatus', generate list of
@@ -213,7 +233,7 @@ class _Worker:  # pylint: disable=too-few-public-methods
     projectsubdir = None
     workdir = None
     checkout = None
-    linters = [PylintLinter, MypyLinter]
+    linters = [PylintLinter, MypyLinter, RuffLinter]
 
     def __init__(self, options):
         self.options = options

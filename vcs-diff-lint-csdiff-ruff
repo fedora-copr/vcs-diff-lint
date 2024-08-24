@@ -1,0 +1,64 @@
+#! /usr/bin/python3
+
+"""
+The csdiff tool doesn't support the Ruff's JSON output yet.  So this just a
+trivial wrapper which reads Ruff's report and transforms it to JSON which is
+supported by csdiff.
+
+The script accepts the same parameters as `ruff check` itself.
+"""
+
+import os
+import sys
+import json
+from subprocess import Popen, PIPE
+
+
+def ruff_check():
+    """
+    Run `ruff check` and return a dict with its results
+    """
+    cmd = ["ruff", "check", "--output-format=json"] + sys.argv[1:]
+    with Popen(cmd, stdout=PIPE) as proc:
+        out, _err = proc.communicate(timeout=60)
+    return json.loads(out)
+
+
+def ruff_code_to_name(code):
+    """
+    Convert noqa code e.g. F401 to its human-readable name, e.g. unused-import
+    """
+    # This implementation will likely kill all ruff performance benefits
+    cmd = ["ruff", "rule", code, "--output-format=json"]
+    with Popen(cmd, stdout=PIPE) as proc:
+        out, _err = proc.communicate(timeout=60)
+    data = json.loads(out)
+    return data["name"]
+
+
+def main():
+    """
+    The main fuction
+    """
+    defects = ruff_check()
+    for defect in defects:
+        path = os.path.relpath(defect["filename"])
+        column = defect["location"]["column"] or ""
+        colsep = ":" if column else ""
+        event = "{0}[{1}]".format(
+            defect["code"], ruff_code_to_name(defect["code"]))
+
+        print("Error: RUFF_WARNING:")
+        print("{file}:{line}{colsep}{column}: {event}: {msg}".format(
+            file=path,
+            line=defect["location"]["row"],
+            colsep=colsep,
+            column=column,
+            event=event,
+            msg=defect["message"],
+        ))
+        print()
+
+
+if __name__ == "__main__":
+    sys.exit(main())

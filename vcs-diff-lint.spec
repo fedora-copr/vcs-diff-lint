@@ -16,6 +16,7 @@ Requires: git
 Requires: pylint
 Requires: python3-mypy
 Requires: python3-types-requests
+Requires: ruff
 
 %description
 Analyze code, and print only reports related to a particular change.
