@@ -24,16 +24,14 @@ def ruff_check():
     return json.loads(out)
 
 
-def ruff_code_to_name(code):
+def ruff_code_to_name():
     """
-    Convert noqa code e.g. F401 to its human-readable name, e.g. unused-import
+    Introspect ruff and map all possible noqa codes to a human-readable names.
     """
-    # This implementation will likely kill all ruff performance benefits
-    cmd = ["ruff", "rule", code, "--output-format=json"]
+    cmd = ["ruff", "rule", "--all", "--output-format=json"]
     with Popen(cmd, stdout=PIPE) as proc:
         out, _err = proc.communicate(timeout=60)
-    data = json.loads(out)
-    return data["name"]
+    return {i["code"]: i["name"] for i in json.loads(out)}
 
 
 def main():
@@ -41,12 +39,14 @@ def main():
     The main fuction
     """
     defects = ruff_check()
+    code_to_name_map = ruff_code_to_name()
+
     for defect in defects:
         path = os.path.relpath(defect["filename"])
         column = defect["location"]["column"] or ""
         colsep = ":" if column else ""
         event = "{0}[{1}]".format(
-            defect["code"], ruff_code_to_name(defect["code"]))
+            defect["code"], code_to_name_map[defect["code"]])
 
         print("Error: RUFF_WARNING:")
         print("{file}:{line}{colsep}{column}: {event}: {msg}".format(
