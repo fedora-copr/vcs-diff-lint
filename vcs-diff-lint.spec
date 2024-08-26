@@ -42,6 +42,7 @@ install -d %buildroot%_bindir
 install -p vcs-diff-lint %buildroot%_bindir
 install -p vcs-diff-lint-csdiff-pylint %buildroot%_bindir
 install -p vcs-diff-lint-csdiff-mypy   %buildroot%_bindir
+install -p vcs-diff-lint-csdiff-ruff   %buildroot%_bindir
 
 
 %files
