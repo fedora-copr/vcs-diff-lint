@@ -1,5 +1,5 @@
 Name:    vcs-diff-lint
-Version: 4
+Version: 5
 Release: 1%{?dist}
 Summary: VCS Differential Code Analysis Tool
 BuildArch: noarch
@@ -52,6 +52,9 @@ install -p vcs-diff-lint-csdiff-ruff   %buildroot%_bindir
 
 
 %changelog
+* Mon Aug 26 2024 Pavel Raiskup <praiskup@redhat.com> - 5-1
+- support for fast "ruff" analyser
+
 * Fri Nov 18 2022 Pavel Raiskup <praiskup@redhat.com> 4-1
 - don't print Mypy errors from files that are not explicitly analyzed
 
