@@ -264,7 +264,9 @@ class _Worker:  # pylint: disable=too-few-public-methods
             log.info("checking for projectdir: %s", path)
             if os.path.realpath(path) == '/':
                 raise Exception("project dir not found")
-            if os.path.isdir(os.path.join(path, '.git')):
+            if os.path.exists(os.path.join(path, '.git')):
+                # .git is either directory (normally) or regular file
+                # in case of running from a git worktree.
                 log.debug("Non-monorepo use-case detected")
                 self.projectdir = '.'
                 self.projectsubdir = '.'
