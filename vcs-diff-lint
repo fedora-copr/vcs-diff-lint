@@ -85,7 +85,7 @@ class _Linter:
         rules = []
         for pair in self.renames:
             old, new = self.modify_rename(pair[0], pair[1])
-            rule = "s|: \"{}\"|: \"{}\"|".format(old, new)
+            rule = "s|^{}:|{}:|".format(old, new)
             rules += ['-e', rule]
 
         return ['sed'] + rules
