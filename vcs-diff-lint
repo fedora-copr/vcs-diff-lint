@@ -287,12 +287,27 @@ class _Worker:  # pylint: disable=too-few-public-methods
 
         # prepare the old checkout
         old_gitroot = os.path.join(self.workdir, 'old_dir')
+        new_gitroot = os.path.join(self.workdir, 'new_dir')
         origin_from = self.gitroot
         check_call(['git', 'clone', '--quiet', origin_from, old_gitroot])
+        check_call(['git', 'clone', '--quiet', origin_from, new_gitroot])
         ret_cwd = os.getcwd()
         try:
             os.chdir(old_gitroot)
             check_call(['git', 'checkout', '-q', self.checkout])
+        finally:
+            os.chdir(ret_cwd)
+
+        try:
+            os.chdir(new_gitroot)
+            with Popen(["git", "-C", origin_from, "diff", "--cached"],
+                       stdout=PIPE) as diff:
+                check_call(["git", "apply", "--allow-empty", "--index", "-"],
+                      stdin=diff.stdout)
+            with Popen(["git", "-C", origin_from, "diff"],
+                       stdout=PIPE) as diff:
+                check_call(["git", "apply", "--allow-empty", "-"],
+                      stdin=diff.stdout)
         finally:
             os.chdir(ret_cwd)
 
@@ -336,7 +351,7 @@ class _Worker:  # pylint: disable=too-few-public-methods
                     break
 
         for linterClass in selected_linters:
-            linter_new = linterClass(self.gitroot)
+            linter_new = linterClass(new_gitroot)
             linter_old = linterClass(old_gitroot, renames)
             linter_new.lint(self.projectdir, new_files, logfd=new_report_fd)
             linter_old.lint(self.projectdir, old_files, logfd=old_report_fd)
