@@ -185,8 +185,10 @@ class RuffLinter(_Linter):
     def is_compatible(self, file):
         return file.type == 'python'
 
-    def command(self, projectdir, filenames):
-        cmd = [CSDIFF_RUFF] + filenames
+    def command(self, projectdir, _filenames):
+        # While we optimize other analyzers and we scan only the changed
+        # set of files, Ruff is fast enough to do full-projectdir scan.
+        cmd = [CSDIFF_RUFF] + [os.path.join(self.gitroot, projectdir)]
         return cmd, {}
 
 
