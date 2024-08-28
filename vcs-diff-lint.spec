@@ -4,7 +4,7 @@ Release: 1%{?dist}
 Summary: VCS Differential Code Analysis Tool
 BuildArch: noarch
 
-License: GPLv2+
+License: GPL-2.0-or-later
 URL:     https://github.com/fedora-copr/vcs-diff-lint
 # Source is created by:
 # git clone %%url && cd vcs-diff-lint
