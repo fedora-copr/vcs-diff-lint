@@ -1,5 +1,5 @@
 Name:    vcs-diff-lint
-Version: 6
+Version: 6.1
 Release: 1%{?dist}
 Summary: VCS Differential Code Analysis Tool
 BuildArch: noarch
@@ -52,6 +52,9 @@ install -p vcs-diff-lint-csdiff-ruff   %buildroot%_bindir
 
 
 %changelog
+* Wed Aug 28 2024 Pavel Raiskup <praiskup@redhat.com> 6.1-1
+- rpm: use SPDX License format
+
 * Wed Aug 28 2024 Pavel Raiskup <praiskup@redhat.com> 6-1
 - bugfix: correctly honor file renames
 - bugfix: fix subproject detection for git worktree
