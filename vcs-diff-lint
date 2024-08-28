@@ -185,10 +185,19 @@ class RuffLinter(_Linter):
     def is_compatible(self, file):
         return file.type == 'python'
 
-    def command(self, projectdir, _filenames):
+    def command(self, projectdir, filenames):
+        cmd = [CSDIFF_RUFF]
+        # Construct --config 'extend-include=["a", "b", ...]' option
+        # per https://github.com/astral-sh/ruff/issues/13122
+        explicitly_include = [fn for fn in filenames if not fn.endswith("*.py")]
+        if explicitly_include:
+            extend_include = ','.join([f'"{fn}"' for fn in explicitly_include])
+            extend_include = f'extend-include=[{extend_include}]'
+            cmd += ["--config", extend_include]
+
         # While we optimize other analyzers and we scan only the changed
         # set of files, Ruff is fast enough to do full-projectdir scan.
-        cmd = [CSDIFF_RUFF] + [os.path.join(self.gitroot, projectdir)]
+        cmd.append(os.path.join(self.gitroot, projectdir))
         return cmd, {}
 
 
