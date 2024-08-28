@@ -1,5 +1,5 @@
 Name:    vcs-diff-lint
-Version: 5
+Version: 6
 Release: 1%{?dist}
 Summary: VCS Differential Code Analysis Tool
 BuildArch: noarch
@@ -52,8 +52,16 @@ install -p vcs-diff-lint-csdiff-ruff   %buildroot%_bindir
 
 
 %changelog
+* Wed Aug 28 2024 Pavel Raiskup <praiskup@redhat.com> 6-1
+- bugfix: correctly honor file renames
+- bugfix: fix subproject detection for git worktree
+- ruff: do full project scans (since Ruff is fast enough)
+- check the new (changed) code in a side-directory
+
 * Mon Aug 26 2024 Pavel Raiskup <praiskup@redhat.com> - 5-1
 - support for fast "ruff" analyser
+- --linter-tag option added
+- subproject detection by .vcs-diff-lint.yml
 
 * Fri Nov 18 2022 Pavel Raiskup <praiskup@redhat.com> 4-1
 - don't print Mypy errors from files that are not explicitly analyzed
