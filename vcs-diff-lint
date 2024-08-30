@@ -189,7 +189,7 @@ class RuffLinter(_Linter):
         cmd = [CSDIFF_RUFF]
         # Construct --config 'extend-include=["a", "b", ...]' option
         # per https://github.com/astral-sh/ruff/issues/13122
-        explicitly_include = [fn for fn in filenames if not fn.endswith("*.py")]
+        explicitly_include = [fn for fn in filenames if not fn.endswith(".py")]
         if explicitly_include:
             extend_include = ','.join([f'"{fn}"' for fn in explicitly_include])
             extend_include = f'extend-include=[{extend_include}]'
