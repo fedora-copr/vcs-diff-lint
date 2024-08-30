@@ -112,8 +112,10 @@ class _Linter:
         oldcwd = os.getcwd()
 
         try:
-            log.info("linting in %s", abs_projectdir)
             os.chdir(abs_projectdir)
+            sha1_cmd = ['git', 'rev-parse', '--short', 'HEAD']
+            sha1 = check_output(sha1_cmd).decode("utf-8")
+            log.info("linting in %s - commit %s", abs_projectdir, sha1)
             files = [f.filename for f in files if self.is_compatible(f)]
             if not files:
                 return
