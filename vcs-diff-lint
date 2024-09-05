@@ -68,6 +68,7 @@ class _Linter:
     filetype = None
     path_filters = None
     linter_tags: List[str] = []
+    full_project_scan = False
 
     def __init__(self, gitroot, renames=None):
         self.gitroot = gitroot
@@ -117,7 +118,7 @@ class _Linter:
             sha1 = check_output(sha1_cmd).decode("utf-8")
             log.info("linting in %s - commit %s", abs_projectdir, sha1)
             files = [f.filename for f in files if self.is_compatible(f)]
-            if not files:
+            if not files and not self.full_project_scan:
                 return
             linter_cmd, linter_env = self.command(projectdir, files)
             log.debug("Running linter command: %s", linter_cmd)
@@ -183,6 +184,7 @@ class RuffLinter(_Linter):
         "ruff",
         "python",
     ]
+    full_project_scan = True
 
     def is_compatible(self, file):
         return file.type == 'python'
