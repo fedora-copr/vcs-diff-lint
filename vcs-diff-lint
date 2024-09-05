@@ -201,7 +201,7 @@ class RuffLinter(_Linter):
 
         # While we optimize other analyzers and we scan only the changed
         # set of files, Ruff is fast enough to do full-projectdir scan.
-        cmd.append(os.path.join(self.gitroot, projectdir))
+        cmd.append('.')
         return cmd, {}
 
 
