@@ -115,7 +115,7 @@ class _Linter:
         try:
             os.chdir(abs_projectdir)
             sha1_cmd = ['git', 'rev-parse', '--short', 'HEAD']
-            sha1 = check_output(sha1_cmd).decode("utf-8")
+            sha1 = check_output(sha1_cmd).decode("utf-8").strip()
             log.info("linting in %s - commit %s", abs_projectdir, sha1)
             files = [f.filename for f in files if self.is_compatible(f)]
             if not files and not self.full_project_scan:
