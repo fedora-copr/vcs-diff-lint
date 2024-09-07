@@ -1,5 +1,5 @@
 Name:    vcs-diff-lint
-Version: 6.1
+Version: 6.2
 Release: 1%{?dist}
 Summary: VCS Differential Code Analysis Tool
 BuildArch: noarch
@@ -52,6 +52,13 @@ install -p vcs-diff-lint-csdiff-ruff   %buildroot%_bindir
 
 
 %changelog
+* Sat Sep 07 2024 Pavel Raiskup <praiskup@redhat.com> 6.2-1
+- drop unnecessary newline in the output
+- ruff: don't prefix the error locations with absolute path
+- ruff: don't optimize out the full Ruff run
+- print the git sha1 being analyzed
+- bugfix: correct matching filenames with endswith()
+
 * Wed Aug 28 2024 Pavel Raiskup <praiskup@redhat.com> 6.1-1
 - rpm: use SPDX License format
 
