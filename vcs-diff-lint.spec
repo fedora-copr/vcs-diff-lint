@@ -47,7 +47,7 @@ install -p vcs-diff-lint-csdiff-ruff   %buildroot%_bindir
 
 %files
 %license LICENSE
-%doc README
+%doc README.md
 %_bindir/vcs-diff-lint*
 
 
