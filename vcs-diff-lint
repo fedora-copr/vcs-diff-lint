@@ -314,12 +314,7 @@ class _Worker:  # pylint: disable=too-few-public-methods
                 return
             path = os.path.normpath(os.path.join(path, '..'))
 
-    def _run_linters(self, old_report_fd, new_report_fd):
-        # pylint: disable=too-many-locals
-        lookup = get_rename_map(self.options, self.projectsubdir)
-        if not lookup:
-            return
-
+    def _prepare_linted_dirs(self):
         # prepare the old checkout
         old_gitroot = os.path.join(self.workdir, 'old_dir')
         new_gitroot = os.path.join(self.workdir, 'new_dir')
@@ -333,18 +328,28 @@ class _Worker:  # pylint: disable=too-few-public-methods
         finally:
             os.chdir(ret_cwd)
 
+        # prepare the new checkout
         try:
             os.chdir(new_gitroot)
             with Popen(["git", "-C", origin_from, "diff", "--cached"],
                        stdout=PIPE) as diff:
                 check_call(["git", "apply", "--allow-empty", "--index", "-"],
-                      stdin=diff.stdout)
+                           stdin=diff.stdout)
             with Popen(["git", "-C", origin_from, "diff"],
                        stdout=PIPE) as diff:
                 check_call(["git", "apply", "--allow-empty", "-"],
-                      stdin=diff.stdout)
+                           stdin=diff.stdout)
         finally:
             os.chdir(ret_cwd)
+        return old_gitroot, new_gitroot
+
+    def _run_linters(self, old_report_fd, new_report_fd):
+        # pylint: disable=too-many-locals
+        lookup = get_rename_map(self.options, self.projectsubdir)
+        if not lookup:
+            return
+
+        old_gitroot, new_gitroot = self._prepare_linted_dirs()
 
         def add_file(gitroot, files, filename):
             if not filename:
