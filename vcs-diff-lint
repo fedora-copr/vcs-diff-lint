@@ -432,9 +432,10 @@ class _Worker:  # pylint: disable=too-few-public-methods
 
             sys.exit(exit_status)
 
-
         finally:
-            log.debug("removing workdir %s", self.workdir)
+            log.debug("%s workdir %s",
+                      "keeping" if self.options.no_cleanup else "removing",
+                      self.workdir)
             if not self.options.no_cleanup:
                 shutil.rmtree(self.workdir)
 
