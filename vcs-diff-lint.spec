@@ -13,10 +13,10 @@ Source0: %name-%version.tar.gz
 
 Requires: csdiff
 Requires: git
-Requires: pylint
-Requires: python3-mypy
-Requires: python3-types-requests
-Requires: ruff
+Recommends: pylint
+Recommends: python3-mypy
+Recommends: python3-types-requests
+Recommends: ruff
 
 %description
 Analyze code, and print only reports related to a particular change.
