@@ -122,12 +122,13 @@ class _Linter:
             os.chdir(abs_projectdir)
             sha1_cmd = ['git', 'rev-parse', '--short', 'HEAD']
             sha1 = check_output(sha1_cmd).decode("utf-8").strip()
-            log.info("linting in %s - commit %s", abs_projectdir, sha1)
+            log.info("%s is linting in %s - commit %s", self.name,
+                     abs_projectdir, sha1)
             files = [f.filename for f in files if self.is_compatible(f)]
             if not files and not self.full_project_scan:
                 return
             linter_cmd, linter_env = self.command(projectdir, files)
-            log.debug("Running linter command: %s", linter_cmd)
+            log.debug("%s command: %s", self.name, linter_cmd)
             env = os.environ.copy()
             env.update(linter_env)
             sed_cmd = self._sed_filter()
