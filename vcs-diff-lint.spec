@@ -1,5 +1,5 @@
 Name:    vcs-diff-lint
-Version: 6.2
+Version: 6.3
 Release: 1%{?dist}
 Summary: VCS Differential Code Analysis Tool
 BuildArch: noarch
@@ -52,6 +52,11 @@ install -p vcs-diff-lint-csdiff-ruff   %buildroot%_bindir
 
 
 %changelog
+* Fri Sep 20 2024 Pavel Raiskup <praiskup@redhat.com> 6.3-1
+- don't require all the linters, just recommend them
+- use requested linters only if they are available
+- nicer info/debug output
+
 * Sat Sep 07 2024 Pavel Raiskup <praiskup@redhat.com> 6.2-1
 - drop unnecessary newline in the output
 - ruff: don't prefix the error locations with absolute path
