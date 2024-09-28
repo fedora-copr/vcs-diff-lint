@@ -10,7 +10,7 @@ The script accepts the same parameters as pylint itself.
 
 import sys
 import json
-import subprocess
+from subprocess import run, PIPE
 
 PYLINT = ["pylint", "-rn", "--score=no", "--output-format=json"]
 
@@ -19,7 +19,7 @@ def _main():
     pylint_command = PYLINT + sys.argv[1:]
 
     # pylint: disable=subprocess-run-check
-    pylint_result = subprocess.run(pylint_command, capture_output=True)
+    pylint_result = run(pylint_command, stdout=PIPE, stderr=PIPE)
     data = json.loads(pylint_result.stdout)
     for defect in data:
         message = defect["obj"] + ": " if defect["obj"] else ""
