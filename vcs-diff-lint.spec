@@ -4,6 +4,13 @@ Release: 1%{?dist}
 Summary: VCS Differential Code Analysis Tool
 BuildArch: noarch
 
+%if 0%{?rhel} == 10
+# missing csdiff / pylint
+%bcond_with check
+%else
+%bcond_without check
+%endif
+
 License: GPL-2.0-or-later
 URL:     https://github.com/fedora-copr/vcs-diff-lint
 # Source is created by:
@@ -11,12 +18,23 @@ URL:     https://github.com/fedora-copr/vcs-diff-lint
 # tito build --tgz --tag %%name-%%version-%%release
 Source0: %name-%version.tar.gz
 
+Source1: https://github.com/praiskup/vcs-diff-lint-testdata/releases/download/v1.0.0/vcs-diff-lint-testdata-1.0.0.bundle
+
 Requires: csdiff
 Requires: git
 Recommends: pylint
 Recommends: python3-mypy
 Recommends: python3-types-requests
 Recommends: ruff
+
+%if %{with check}
+BuildRequires: csdiff
+BuildRequires: git
+BuildRequires: pylint
+BuildRequires: rpmdevtools
+BuildRequires: python3-pytest
+%endif
+
 
 %description
 Analyze code, and print only reports related to a particular change.
@@ -31,6 +49,9 @@ added (or even fixed, as opt-in) analyzers' warnings.
 
 %prep
 %autosetup
+%if %{with check}
+cp %{SOURCE1} ./
+%endif
 
 
 %build
@@ -43,6 +64,11 @@ install -p vcs-diff-lint %buildroot%_bindir
 install -p vcs-diff-lint-csdiff-pylint %buildroot%_bindir
 install -p vcs-diff-lint-csdiff-mypy   %buildroot%_bindir
 install -p vcs-diff-lint-csdiff-ruff   %buildroot%_bindir
+
+%if %{with check}
+%check
+./run-tests.sh --no-cov
+%endif
 
 
 %files
