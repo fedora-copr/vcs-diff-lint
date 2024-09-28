@@ -111,13 +111,9 @@ class _Linter:
 
     def lint(self, projectdir, files, logfd):
         """ run the linter """
-        if not files:
-            return
-
         abs_projectdir = os.path.join(self.gitroot, projectdir)
 
         oldcwd = os.getcwd()
-
         try:
             os.chdir(abs_projectdir)
             sha1_cmd = ['git', 'rev-parse', '--short', 'HEAD']
