@@ -292,7 +292,7 @@ class _Worker:  # pylint: disable=too-few-public-methods
 
         path = os.getcwd()
         while True:
-            log.info("checking for projectdir: %s", path)
+            log.info("checking for projectdir: {}".format(path))
             if os.path.realpath(path) == '/':
                 raise Exception("project dir not found")
             if os.path.exists(os.path.join(path, '.git')):
@@ -302,7 +302,7 @@ class _Worker:  # pylint: disable=too-few-public-methods
                 self.projectdir = '.'
                 self.projectsubdir = '.'
                 return
-            if glob.glob(os.path.join(path, '*.spec')):
+            if path.endswith('.spec'):
                 rel_projdir(path)
                 return
             if os.path.exists(os.path.join(path, ".vcs-diff-lint.yml")):
