@@ -1,5 +1,5 @@
 Name:    vcs-diff-lint
-Version: 6.3
+Version: 6.4
 Release: 1%{?dist}
 Summary: VCS Differential Code Analysis Tool
 BuildArch: noarch
@@ -78,6 +78,10 @@ install -p vcs-diff-lint-csdiff-ruff   %buildroot%_bindir
 
 
 %changelog
+* Wed Oct 16 2024 Pavel Raiskup <praiskup@redhat.com> 6.4-1
+- add a basic test-suite
+- drop duplicated check for empty list of changed files
+
 * Fri Sep 20 2024 Pavel Raiskup <praiskup@redhat.com> 6.3-1
 - don't require all the linters, just recommend them
 - use requested linters only if they are available
