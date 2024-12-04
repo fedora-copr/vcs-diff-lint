@@ -21,7 +21,7 @@ Source0: %name-%version.tar.gz
 Source1: https://github.com/praiskup/vcs-diff-lint-testdata/releases/download/v1.0.0/vcs-diff-lint-testdata-1.0.0.bundle
 
 Requires: csdiff
-Requires: git
+Requires: git-core
 Recommends: pylint
 Recommends: python3-mypy
 Recommends: python3-types-requests
@@ -29,7 +29,7 @@ Recommends: ruff
 
 %if %{with check}
 BuildRequires: csdiff
-BuildRequires: git
+BuildRequires: git-core
 BuildRequires: pylint
 BuildRequires: rpmdevtools
 BuildRequires: python3-pytest
