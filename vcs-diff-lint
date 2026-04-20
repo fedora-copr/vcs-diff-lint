@@ -28,6 +28,8 @@ CSDIFF_MYPY = os.path.realpath(os.path.join(os.path.dirname(__file__),
 CSDIFF_RUFF = os.path.realpath(
     os.path.join(os.path.dirname(__file__), 'vcs-diff-lint-csdiff-ruff'))
 
+CSDIFF_YAMLLINT = os.path.realpath(
+    os.path.join(os.path.dirname(__file__), 'vcs-diff-lint-csdiff-yamllint'))
 
 def _run_csdiff(old, new, msg):
     popen_diff = Popen(['csdiff', '-c', old, new],
@@ -223,6 +225,28 @@ class RuffLinter(_Linter):
         return cmd, {}
 
 
+class YamlLintLinter(_Linter):
+    """
+    yamllint linter
+    """
+    name = "YamlLint"
+    linter_tags = [
+        "yaml",
+        "yamllint",
+    ]
+    full_project_scan = True
+
+    @classmethod
+    def is_ready(cls):
+        return os.path.exists("/usr/bin/yamllint")
+
+    def command(self, projectdir, _filenames):
+        # While we optimize other analyzers and we scan only the changed
+        # set of files, yamllint is fast enough to do full-projectdir scan.
+        cmd = [CSDIFF_YAMLLINT, projectdir]
+        return cmd, {}
+
+
 def get_rename_map(options, subdir):
     """
     Using the os.getcwd() and 'git diff --namestatus', generate list of
@@ -266,7 +290,7 @@ class _Worker:  # pylint: disable=too-few-public-methods
     projectsubdir = None
     workdir = None
     checkout = None
-    linters = [PylintLinter, MypyLinter, RuffLinter]
+    linters = [PylintLinter, MypyLinter, RuffLinter, YamlLintLinter]
 
     def __init__(self, options):
         self.options = options

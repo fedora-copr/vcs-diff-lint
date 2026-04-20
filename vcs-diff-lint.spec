@@ -26,6 +26,7 @@ Recommends: pylint
 Recommends: python3-mypy
 Recommends: python3-types-requests
 Recommends: ruff
+Recommends: yamllint
 
 %if %{with check}
 BuildRequires: csdiff
@@ -33,6 +34,7 @@ BuildRequires: git-core
 BuildRequires: pylint
 BuildRequires: rpmdevtools
 BuildRequires: python3-pytest
+BuildRequires: yamllint
 %endif
 
 
@@ -64,6 +66,7 @@ install -p vcs-diff-lint %buildroot%_bindir
 install -p vcs-diff-lint-csdiff-pylint %buildroot%_bindir
 install -p vcs-diff-lint-csdiff-mypy   %buildroot%_bindir
 install -p vcs-diff-lint-csdiff-ruff   %buildroot%_bindir
+install -p vcs-diff-lint-csdiff-yamllint %buildroot%_bindir
 
 %if %{with check}
 %check
