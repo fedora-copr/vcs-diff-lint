@@ -1,0 +1,87 @@
+#! /usr/bin/python3
+
+"""
+Analyze code using yamllint, and provide csdiff list of errors.
+"""
+
+import subprocess
+import sys
+import re
+
+LINE_RE = re.compile(
+    r'^([^:]+):(\d+):(\d+): \[(error|warning)\] (.*)$'
+)
+
+RULE_RE = re.compile(r'\(([^)]+)\)$')
+
+
+def run_yamllint(paths):
+    """
+    Run the bare yamllint command, return output lines.
+    """
+    cmd = ["yamllint", "-f", "parsable"] + paths
+    proc = subprocess.run(
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=False,
+    )
+    return proc.stdout.splitlines()
+
+
+def parse_line(line):
+    """
+    Parse "-f parsable" output line.  Return dict with field names.
+    """
+    m = LINE_RE.match(line)
+    if not m:
+        return None
+
+    file, line_no, col, level, msg = m.groups()
+
+    severity = "ERROR" if level == "error" else "WARNING"
+
+    rule = "unknown"
+    r = RULE_RE.search(msg)
+    if r:
+        rule = r.group(1)
+        msg = RULE_RE.sub("", msg).strip()
+
+    return {
+        "file": file,
+        "line": line_no,
+        "col": col,
+        "severity": severity,
+        "rule": rule,
+        "message": msg,
+    }
+
+
+def format_issue(issue):
+    """
+    Provide csdiff compliant output.
+    """
+    return (
+        f"Error: YAMLLINT_{issue['severity']}:\n"
+        f"{issue['file']}:{issue['line']}:{issue['col']}: "
+        f"YAMLLINT[{issue['rule']}]: {issue['message']}\n"
+    )
+
+
+def _main():
+    if len(sys.argv) < 2:
+        print(f"Usage: {sys.argv[0]} <file-or-dir> [...]", file=sys.stderr)
+        sys.exit(1)
+
+    paths = sys.argv[1:]
+    lines = run_yamllint(paths)
+
+    for line in lines:
+        parsed = parse_line(line)
+        if parsed:
+            print(format_issue(parsed))
+
+
+if __name__ == "__main__":
+    _main()
