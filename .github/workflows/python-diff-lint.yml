@@ -20,6 +20,7 @@ jobs:
           linter_tags: |
             ruff
             pylint
+          debug: true
 
       - name: Upload artifact with detected defects in SARIF format
         uses: actions/upload-artifact@v4
