@@ -1,5 +1,5 @@
 Name:    vcs-diff-lint
-Version: 6.5
+Version: 6.6
 Release: 1%{?dist}
 Summary: VCS Differential Code Analysis Tool
 BuildArch: noarch
@@ -81,6 +81,9 @@ install -p vcs-diff-lint-csdiff-yamllint %buildroot%_bindir
 
 
 %changelog
+* Fri Apr 24 2026 Pavel Raiskup <pavel@raiskup.cz> 6.6-1
+- Fix stdout buffering
+
 * Fri Apr 24 2026 Pavel Raiskup <pavel@raiskup.cz> 6.5-1
 - yamllint support
 - depend on git-core instead of git
