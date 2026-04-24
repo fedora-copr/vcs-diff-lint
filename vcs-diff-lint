@@ -7,7 +7,7 @@ Using 'csdiff', print newly added coding errors.
 import fnmatch
 import os
 import sys
-from subprocess import Popen, PIPE, check_output, check_call
+from subprocess import run, Popen, PIPE, check_output, check_call
 import glob
 import logging
 import tempfile
@@ -31,17 +31,17 @@ CSDIFF_RUFF = os.path.realpath(
 CSDIFF_YAMLLINT = os.path.realpath(
     os.path.join(os.path.dirname(__file__), 'vcs-diff-lint-csdiff-yamllint'))
 
+
 def _run_csdiff(old, new, msg):
-    popen_diff = Popen(['csdiff', '-c', old, new],
-                       stdout=PIPE)
-    diff = popen_diff.communicate()[0].decode('utf-8')
+    res = run(['csdiff', '-c', old, new], stdout=PIPE,
+              universal_newlines=True, check=False,
+              encoding="utf-8")
+    diff = res.stdout
     if diff:
         if msg:
-            sep = "=" * (len(msg) + 2)
-            print("# " + sep)
-            print("#  {} ".format(msg))
-            print("# " + sep + "\n")
-        sys.stdout.write(diff)
+            sep = "# " + "=" * (len(msg) + 2) + "\n"
+            print(f"{sep}#  {msg}\n{sep}")
+        print(diff, end='')
     return int(bool(diff))
 
 
