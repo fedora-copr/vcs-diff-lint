@@ -1,5 +1,5 @@
 Name:    vcs-diff-lint
-Version: 6.6
+Version: 6.7
 Release: 1%{?dist}
 Summary: VCS Differential Code Analysis Tool
 BuildArch: noarch
@@ -81,6 +81,11 @@ install -p vcs-diff-lint-csdiff-yamllint %buildroot%_bindir
 
 
 %changelog
+* Sun Apr 26 2026 Pavel Raiskup <pavel@raiskup.cz> 6.7-1
+- Handle (no traceback) "invalid-syntax" code from Ruff
+- log.debug() all git commands
+- do not let "git apply" pollute stderr with whitespace errors
+
 * Fri Apr 24 2026 Pavel Raiskup <pavel@raiskup.cz> 6.6-1
 - Fix stdout buffering
 
