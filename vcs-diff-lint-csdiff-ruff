@@ -45,8 +45,11 @@ def main():
         path = os.path.relpath(defect["filename"])
         column = defect["location"]["column"] or ""
         colsep = ":" if column else ""
-        event = "{0}[{1}]".format(
-            defect["code"], code_to_name_map[defect["code"]])
+        try:
+            event = f"{defect['code']}[{code_to_name_map[defect['code']]}]"
+        except KeyError:
+            # Ruff is using weird "code" :-/
+            event = f"RUFF_UNKNOWN_ERROR[{defect['code']}]"
 
         print("Error: RUFF_WARNING:")
         print("{file}:{line}{colsep}{column}: {event}: {msg}".format(
