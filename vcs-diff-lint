@@ -47,6 +47,21 @@ def _run_csdiff(old, new, msg):
     return int(bool(diff))
 
 
+def _check_output(cmd):
+    log.debug("running: %s", " ".join(cmd))
+    return check_output(cmd).decode('utf-8')
+
+
+def _check_call(cmd, *args, **kwargs):
+    log.debug("running: %s", " ".join(cmd))
+    return check_call(cmd, *args, **kwargs)
+
+
+def _popen(cmd, *args, **kwargs):
+    log.debug("running: %s", " ".join(cmd))
+    return Popen(cmd, *args, **kwargs)
+
+
 def file_type(filename):
     """
     Taking FILENAME (must exist), return it's type in string format.  Current
@@ -121,7 +136,7 @@ class _Linter:
         try:
             os.chdir(abs_projectdir)
             sha1_cmd = ['git', 'rev-parse', '--short', 'HEAD']
-            sha1 = check_output(sha1_cmd).decode("utf-8").strip()
+            sha1 = _check_output(sha1_cmd).strip()
             log.info("%s is linting in %s - commit %s", self.name,
                      abs_projectdir, sha1)
             files = [f.filename for f in files if self.is_compatible(f)]
@@ -133,11 +148,11 @@ class _Linter:
             env.update(linter_env)
             sed_cmd = self._sed_filter()
             if sed_cmd:
-                linter = Popen(linter_cmd, env=env, stdout=PIPE)
-                sed = Popen(sed_cmd, stdout=logfd, stdin=linter.stdout)
+                linter = _popen(linter_cmd, env=env, stdout=PIPE)
+                sed = _popen(sed_cmd, stdout=logfd, stdin=linter.stdout)
                 sed.communicate()
             else:
-                linter = Popen(linter_cmd, env=env, stdout=logfd)
+                linter = _popen(linter_cmd, env=env, stdout=logfd)
                 linter.communicate()
 
         finally:
@@ -255,13 +270,11 @@ def get_rename_map(options, subdir):
     files to analyze with possible overrides.  The returned format is
     dict of format 'new_file' -> 'old_file'.
     """
-    cmd = ['git', 'diff', '--name-status', '-C', options.compare_against,
-           '--numstat', '--relative', os.path.join(".", subdir)]
-
-    log.debug("running: %s", " ".join(cmd))
     # current file -> old_name
     return_map = {}
-    output = check_output(cmd).decode('utf-8')
+    output = _check_output(['git', 'diff', '--name-status',
+                            '-C', options.compare_against, '--numstat',
+                            '--relative', os.path.join(".", subdir)])
     for line in output.split('\n'):
         if not line:
             continue
@@ -299,12 +312,12 @@ class _Worker:  # pylint: disable=too-few-public-methods
 
     def _analyze_projectdir(self):
         """ find sub-directory in git repo which contains spec file """
-        gitroot = check_output(['git', 'rev-parse', '--show-toplevel'])
-        self.gitroot = gitroot.decode('utf-8').strip()
+        gitroot = _check_output(['git', 'rev-parse', '--show-toplevel'])
+        self.gitroot = gitroot.strip()
 
-        checkout = check_output(['git', 'rev-parse',
-                                 self.options.compare_against])
-        self.checkout = checkout.decode('utf-8').strip()
+        checkout = _check_output(['git', 'rev-parse',
+                                  self.options.compare_against])
+        self.checkout = checkout.strip()
 
         def rel_projdir(projdir):
             gitroot_a = os.path.realpath(self.gitroot)
@@ -341,26 +354,26 @@ class _Worker:  # pylint: disable=too-few-public-methods
         old_gitroot = os.path.join(self.workdir, 'old_dir')
         new_gitroot = os.path.join(self.workdir, 'new_dir')
         origin_from = self.gitroot
-        check_call(['git', 'clone', '--quiet', origin_from, old_gitroot])
-        check_call(['git', 'clone', '--quiet', origin_from, new_gitroot])
+        _check_call(['git', 'clone', '--quiet', origin_from, old_gitroot])
+        _check_call(['git', 'clone', '--quiet', origin_from, new_gitroot])
         ret_cwd = os.getcwd()
         try:
             os.chdir(old_gitroot)
-            check_call(['git', 'checkout', '-q', self.checkout])
+            _check_call(['git', 'checkout', '-q', self.checkout])
         finally:
             os.chdir(ret_cwd)
 
         # prepare the new checkout
         try:
             os.chdir(new_gitroot)
-            with Popen(["git", "-C", origin_from, "diff", "--cached"],
-                       stdout=PIPE) as diff:
-                check_call(GIT + ["apply", "--allow-empty", "--index", "-"],
-                           stdin=diff.stdout)
-            with Popen(["git", "-C", origin_from, "diff"],
-                       stdout=PIPE) as diff:
-                check_call(GIT + ["apply", "--allow-empty", "-"],
-                           stdin=diff.stdout)
+            with _popen(["git", "-C", origin_from, "diff", "--cached"],
+                        stdout=PIPE) as diff:
+                _check_call(GIT + ["apply", "--allow-empty", "--index", "-"],
+                            stdin=diff.stdout)
+            with _popen(["git", "-C", origin_from, "diff"],
+                        stdout=PIPE) as diff:
+                _check_call(GIT + ["apply", "--allow-empty", "-"],
+                            stdin=diff.stdout)
         finally:
             os.chdir(ret_cwd)
         return old_gitroot, new_gitroot
