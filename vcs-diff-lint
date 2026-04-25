@@ -31,6 +31,8 @@ CSDIFF_RUFF = os.path.realpath(
 CSDIFF_YAMLLINT = os.path.realpath(
     os.path.join(os.path.dirname(__file__), 'vcs-diff-lint-csdiff-yamllint'))
 
+GIT = ['git', '-c', 'apply.whitespace=nowarn']
+
 
 def _run_csdiff(old, new, msg):
     res = run(['csdiff', '-c', old, new], stdout=PIPE,
@@ -353,11 +355,11 @@ class _Worker:  # pylint: disable=too-few-public-methods
             os.chdir(new_gitroot)
             with Popen(["git", "-C", origin_from, "diff", "--cached"],
                        stdout=PIPE) as diff:
-                check_call(["git", "apply", "--allow-empty", "--index", "-"],
+                check_call(GIT + ["apply", "--allow-empty", "--index", "-"],
                            stdin=diff.stdout)
             with Popen(["git", "-C", origin_from, "diff"],
                        stdout=PIPE) as diff:
-                check_call(["git", "apply", "--allow-empty", "-"],
+                check_call(GIT + ["apply", "--allow-empty", "-"],
                            stdin=diff.stdout)
         finally:
             os.chdir(ret_cwd)
